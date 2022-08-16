@@ -24,7 +24,8 @@ defmodule Plsm.Mixfile do
       {:myxql, "~> 0.6.0"},
       {:postgrex, "~> 0.16"},
       {:ecto_sql, "~> 3.6", only: :test},
-      {:mock, "~> 0.2.0", only: :test}
+      {:mock, "~> 0.2.0", only: :test},
+      {:inflex, "~> 2.0.0"}
     ]
   end
 

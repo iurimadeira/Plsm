@@ -135,7 +135,7 @@ defimpl Plsm.Database, for: Plsm.Database.PostgreSQL do
     {_, is_pk} = Enum.fetch(row, 2)
 
     %Plsm.Database.Column{
-      name: name,
+      name: Inflex.underscore(name),
       type: type,
       primary_key: is_pk,
       foreign_table: foreign_table,
