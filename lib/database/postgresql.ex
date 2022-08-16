@@ -40,16 +40,39 @@ defimpl Plsm.Database, for: Plsm.Database.PostgreSQL do
     }
   end
 
+  def get_tables(db), do: get_tables(db, nil)
+
   # pass in a database and then get the tables using the Postgrex query then turn the rows into a table
   @spec get_tables(Plsm.Database.PostgreSQL) :: [Plsm.Database.TableHeader]
-  def get_tables(db) do
+  def get_tables(db, table_name) when is_binary(table_name) do
+    IO.puts("Getting #{table_name} table...")
+
+    {_, result} =
+      Postgrex.query(
+        db.connection,
+        "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' and table_name = '#{table_name}';",
+        []
+      )
+      |> IO.inspect()
+
+    do_get_tables(db, result)
+  end
+
+  def get_tables(db, _table_name) do
+    IO.puts("Getting all tables...")
+
     {_, result} =
       Postgrex.query(
         db.connection,
         "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';",
         []
       )
+      |> IO.inspect()
 
+    do_get_tables(db, result)
+  end
+
+  def do_get_tables(db, result) do
     result.rows
     |> List.flatten()
     |> Enum.map(fn x -> %Plsm.Database.TableHeader{database: db, name: x} end)

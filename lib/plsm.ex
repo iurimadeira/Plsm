@@ -1,16 +1,22 @@
 defmodule Mix.Tasks.Plsm do
   use Mix.Task
 
-  def run(_) do
+  def run(args) do
     # ensure all dependencies are started manually.
     {:ok, _started} = Application.ensure_all_started(:postgrex)
 
     configs = Plsm.Common.Configs.load_configs()
 
+    table_name =
+      case args do
+        [] -> nil
+        [table_name | _] -> table_name
+      end
+
     configs
     |> Plsm.Database.Common.create()
     |> Plsm.Database.connect()
-    |> Plsm.Database.get_tables()
+    |> Plsm.Database.get_tables(table_name)
     |> Enum.map(fn x -> {x, Plsm.Database.get_columns(x.database, x)} end)
     |> Enum.map(fn {header, columns} -> %Plsm.Database.Table{header: header, columns: columns} end)
     |> Enum.map(fn table -> Plsm.IO.Export.prepare(table, configs.project.name) end)
